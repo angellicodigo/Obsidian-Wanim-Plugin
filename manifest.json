@@ -1,0 +1,11 @@
+{
+	"id": "obsidian-wanim-plugin",
+	"name": "Obsidian Wanim Plugin",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Render Python Manim animations inside Obsidian using Wanim",
+	"author": "Obsidian Wanim Team",
+	"authorUrl": "https://github.com/Acfboy/Wanim",
+	"fundingUrl": {},
+	"isDesktopOnly": false
+}

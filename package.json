@@ -1,0 +1,45 @@
+{
+	"name": "obsidian-wanim-plugin",
+	"version": "1.0.0",
+	"description": "Render Python Manim animations inside Obsidian using Wanim",
+	"main": "main.js",
+	"type": "module",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"test": "node tests/run_tests.mjs",
+		"test:m6": "node tests/run_m6_tests.mjs"
+	},
+	"keywords": [
+		"obsidian",
+		"manim",
+		"wanim",
+		"python",
+		"animation",
+		"canvas"
+	],
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^16.11.6",
+		"esbuild": "0.25.5",
+		"obsidian": "latest",
+		"tslib": "2.4.0",
+		"typescript": "^5.8.3"
+	},
+	"dependencies": {
+		"@codemirror/autocomplete": "^6.17.0",
+		"@codemirror/commands": "6.10.3",
+		"@codemirror/lang-python": "^6.2.1",
+		"@codemirror/language": "6.12.2",
+		"@codemirror/state": "^6.5.0",
+		"@codemirror/theme-one-dark": "^6.1.3",
+		"@codemirror/view": "^6.38.6",
+		"@replit/codemirror-vim": "^6.4.0",
+		"@uiw/codemirror-theme-github": "^4.25.8",
+		"@uiw/codemirror-theme-monokai": "^4.25.8",
+		"@wanimjs/wanim": "0.1.3",
+		"mathjax-full": "^3.2.2",
+		"numpy-ts": "^1.7.0",
+		"opentype.js": "^2.0.0"
+	}
+}
