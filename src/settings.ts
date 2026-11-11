@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import MyPlugin from './main';
-import type { WanimEditorTheme, WanimPluginSettings } from './types';
+import type { WanimEditorFont, WanimEditorTheme, WanimPluginSettings } from './types';
 
 export const DEFAULT_SETTINGS: WanimPluginSettings = {
 	editorTheme: 'obsidian',
@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS: WanimPluginSettings = {
 	renderQuality: '-qm',
 	autoRunOnOpen: false,
 	editorFontSize: 14,
+	editorFontFamily: 'JetBrains Mono',
 };
 
 export class WanimSettingTab extends PluginSettingTab {
@@ -112,6 +113,24 @@ export class WanimSettingTab extends PluginSettingTab {
 							await this.plugin.saveSettings();
 							this.plugin.updateAllEditorFontSizes(numValue);
 						}
+					})
+			);
+
+		new Setting(containerEl)
+			.setName('Editor font')
+			.setDesc('Font used by embedded Wanim code editors. If it is not installed, Obsidian uses its monospace fallback.')
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOption('JetBrains Mono', 'JetBrains Mono')
+					.addOption('Mononoki', 'Mononoki')
+					.addOption('Monaspace Neon', 'Monaspace')
+					.addOption('Source Code Pro', 'Source Code Pro')
+					.addOption('Consolas', 'Consolas')
+					.setValue(this.plugin.settings.editorFontFamily)
+					.onChange(async (value: WanimEditorFont) => {
+						this.plugin.settings.editorFontFamily = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateAllEditorFontFamilies(value);
 					})
 			);
 	}

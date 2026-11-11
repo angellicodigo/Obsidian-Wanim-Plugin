@@ -3,5 +3,7 @@
   "autoSaveDelaySeconds": 5,
   "defaultCollapsed": true,
   "renderQuality": "-qm",
-  "autoRunOnOpen": false
+  "autoRunOnOpen": false,
+  "editorFontSize": 16,
+  "editorFontFamily": "Mononoki"
 }

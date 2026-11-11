@@ -39,22 +39,14 @@ function createCanvasElement(): HTMLCanvasElement {
 	return canvas;
 }
 
-function createSceneAdapter(
-	playerOrScene: any,
-	cleanupListeners: () => void,
+function createControllerAdapter(
+	controllerRef: { value: any },
+	stateRef: { value: SceneStateChange },
 ): ConstructableScene {
 	const stateListeners = new Set<(state: SceneStateChange) => void>();
 
 	const notifyState = () => {
-		const isPlaying = Boolean(playerOrScene.isPlaying);
-		const isFinished = Boolean(playerOrScene._masterTimeline?.isFinished?.());
-		const currentTime = playerOrScene._masterTimeline?.getCurrentTime?.() ?? 0;
-		const isPaused = !isPlaying && !isFinished && currentTime > 0;
-		const payload: SceneStateChange = {
-			isRunning: isPlaying,
-			isPaused,
-			isFinished,
-		};
+		const payload = stateRef.value;
 		for (const listener of stateListeners) {
 			try {
 				listener(payload);
@@ -64,64 +56,32 @@ function createSceneAdapter(
 		}
 	};
 
-	const origPlay = typeof playerOrScene.play === 'function' ? playerOrScene.play.bind(playerOrScene) : null;
-	if (origPlay) {
-		playerOrScene.play = function (...args: any[]) {
-			origPlay(...args);
-			notifyState();
-		};
-	}
-
-	const origPause = typeof playerOrScene.pause === 'function' ? playerOrScene.pause.bind(playerOrScene) : null;
-	if (origPause) {
-		playerOrScene.pause = function (...args: any[]) {
-			origPause(...args);
-			notifyState();
-		};
-	}
-
-	if (playerOrScene._ui && typeof playerOrScene._ui.setPlaying === 'function') {
-		const origSetPlaying = playerOrScene._ui.setPlaying.bind(playerOrScene._ui);
-		playerOrScene._ui.setPlaying = function (isPlaying: boolean, isFinished = false) {
-			origSetPlaying(isPlaying, isFinished);
-			notifyState();
-		};
-	}
-
-	return {
+	const adapter: ConstructableScene & { __notifyState?: () => void } = {
 		get isPlaying() {
-			return Boolean(playerOrScene.isPlaying);
+			return stateRef.value.isRunning;
 		},
 		get isPaused() {
-			const isPlaying = Boolean(playerOrScene.isPlaying);
-			const isFinished = Boolean(playerOrScene._masterTimeline?.isFinished?.());
-			return !isPlaying && !isFinished;
+			return stateRef.value.isPaused;
 		},
 		play: async () => {
-			playerOrScene.play?.();
+			controllerRef.value?.restart?.();
 			notifyState();
 		},
 		pause: () => {
-			playerOrScene.pause?.();
+			controllerRef.value?.abort?.();
 			notifyState();
 		},
 		resume: () => {
-			playerOrScene.play?.();
+			controllerRef.value?.restart?.();
 			notifyState();
 		},
 		stop: () => {
-			playerOrScene.pause?.();
-			playerOrScene.seek?.(0);
+			controllerRef.value?.abort?.();
 			notifyState();
 		},
 		dispose: () => {
-			cleanupListeners();
+			controllerRef.value?.abort?.();
 			stateListeners.clear();
-			try {
-				playerOrScene.dispose?.();
-			} catch {
-				// ignore disposal errors
-			}
 		},
 		onStateChange: (listener: (state: SceneStateChange) => void) => {
 			stateListeners.add(listener);
@@ -131,6 +91,8 @@ function createSceneAdapter(
 			};
 		},
 	};
+	adapter.__notifyState = notifyState;
+	return adapter;
 }
 
 export async function runWanimSource(
@@ -163,37 +125,39 @@ export async function runWanimSource(
 	canvas.style.width = '100%';
 	canvas.style.height = '100%';
 
-	let capturedResult: any = null;
+	const controllerRef = { value: null as any };
+	const stateRef = { value: { isRunning: true, isPaused: false, isFinished: false } as SceneStateChange };
+	const adapter = createControllerAdapter(controllerRef, stateRef);
+	let notifiedReady = false;
+	// Use Wanim's GPU renderer for 3D. The bundler below makes its scratch
+	// WebGL canvas a DOM canvas instead of an OffscreenCanvas, which lets
+	// Electron reliably composite the result into this visible 2D canvas.
+	// If WebGL2 is actually unavailable, Wanim still falls back to Canvas2D.
+	const useWebGL = true;
 
 	try {
 		// Load RapydScript compiler lazily on first render
 		await ensureRapydScriptLoaded();
 
-		const result = await runPythonOnCanvas(source, canvas, {
+		await runPythonOnCanvas(source, canvas, ({
 			quality,
 			mode: 'normal',
 			theme: 'auto',
 			realtime: true,
 			fps: 30,
-			onSceneReady: (scene: unknown) => {
-				capturedResult = scene;
-				if (onSceneReady) {
-					const adapter = createSceneAdapter(scene as any, () => {
-						// no-op cleanup
-					});
-					onSceneReady(adapter);
+			useWebGL,
+			onController: (controller: unknown) => { controllerRef.value = controller; },
+			onSceneReady: () => {
+				if (!notifiedReady) {
+					notifiedReady = true;
+					onSceneReady?.(adapter);
 				}
 			},
-		});
-
-		if (capturedResult) {
-			const adapter = createSceneAdapter(capturedResult, () => {
-				// no-op cleanup
-			});
-			return adapter;
-		}
-
-		return null;
+		} as any));
+		stateRef.value = { isRunning: false, isPaused: false, isFinished: true };
+		(adapter as any).__notifyState?.();
+		if (!notifiedReady) onSceneReady?.(adapter);
+		return adapter;
 	} catch (error) {
 		console.error('Wanim render failed:', error);
 		throw error;

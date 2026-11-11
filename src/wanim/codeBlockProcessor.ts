@@ -42,6 +42,11 @@ export function registerWanimCodeBlockProcessor(plugin: MyPlugin): void {
 		const controls = header.createDiv({ cls: 'manim-block-controls' });
 		const saveState = controls.createSpan({ cls: 'manim-save-state' });
 		saveState.style.display = 'none';
+		// Saving and rendering used to share one label.  A completed auto-save
+		// would hide “Running...” after its one-second timer even though the scene
+		// was still playing.
+		const runState = controls.createSpan({ cls: 'manim-run-state' });
+		runState.style.display = 'none';
 
 		const runButton = controls.createEl('button', { cls: 'manim-control-button manim-run-button' });
 		runButton.type = 'button';
@@ -164,8 +169,8 @@ export function registerWanimCodeBlockProcessor(plugin: MyPlugin): void {
 			isPaused = false;
 			setButtonState('pause');
 
-			saveState.textContent = 'Running...';
-			saveState.style.display = 'inline-block';
+			runState.textContent = 'Running...';
+			runState.style.display = 'inline-block';
 			errorPanel.style.display = 'none';
 			errorPanel.textContent = '';
 
@@ -196,16 +201,16 @@ export function registerWanimCodeBlockProcessor(plugin: MyPlugin): void {
 							isPaused = state.isPaused;
 							if (state.isRunning) {
 								setButtonState('pause');
-								saveState.textContent = 'Running...';
-								saveState.style.display = 'inline-block';
+								runState.textContent = 'Running...';
+								runState.style.display = 'inline-block';
 							} else if (state.isPaused) {
 								setButtonState('run');
-								saveState.textContent = 'Paused';
-								saveState.style.display = 'inline-block';
+								runState.textContent = 'Paused';
+								runState.style.display = 'inline-block';
 							} else {
 								setButtonState('run');
-								saveState.textContent = '';
-								saveState.style.display = 'none';
+								runState.textContent = '';
+								runState.style.display = 'none';
 							}
 						});
 					}
@@ -225,8 +230,8 @@ export function registerWanimCodeBlockProcessor(plugin: MyPlugin): void {
 					isRunning = false;
 					isPaused = false;
 					setButtonState('run');
-					saveState.textContent = '';
-					saveState.style.display = 'none';
+					runState.textContent = '';
+					runState.style.display = 'none';
 				}
 			} catch (error) {
 				if (thisExecutionId !== executionCounter || isBlockUnloaded) {
@@ -236,8 +241,8 @@ export function registerWanimCodeBlockProcessor(plugin: MyPlugin): void {
 				cleanup?.();
 				unsubscribeSceneState = null;
 				const message = error instanceof Error ? error.message : String(error);
-				saveState.textContent = '';
-				saveState.style.display = 'none';
+				runState.textContent = '';
+				runState.style.display = 'none';
 				errorPanel.textContent = formatRuntimeError(error);
 				errorPanel.style.display = 'block';
 				new Notice(`Wanim render failed: ${message}`);
@@ -270,8 +275,8 @@ export function registerWanimCodeBlockProcessor(plugin: MyPlugin): void {
 				isPaused = true;
 				isRunning = false;
 				setButtonState('run');
-				saveState.textContent = 'Paused';
-				saveState.style.display = 'inline-block';
+				runState.textContent = 'Paused';
+				runState.style.display = 'inline-block';
 				return;
 			}
 
@@ -282,8 +287,8 @@ export function registerWanimCodeBlockProcessor(plugin: MyPlugin): void {
 						isPaused = false;
 						isRunning = true;
 						setButtonState('pause');
-						saveState.textContent = 'Running...';
-						saveState.style.display = 'inline-block';
+						runState.textContent = 'Running...';
+						runState.style.display = 'inline-block';
 						return;
 					} catch {
 						// fallback to re-running if resume fails
@@ -313,6 +318,10 @@ export function registerWanimCodeBlockProcessor(plugin: MyPlugin): void {
 			handleRestartClick();
 		});
 
-		void execute();
+		// Keep opening a note side-effect free unless the user explicitly enables
+		// auto-run in settings.  The Run button remains the explicit entry point.
+		if (plugin.settings.autoRunOnOpen) {
+			void execute();
+		}
 	});
 }

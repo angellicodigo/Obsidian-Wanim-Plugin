@@ -9,7 +9,7 @@ import { MarkdownPostProcessorContext, MarkdownRenderChild, Plugin } from 'obsid
 import { wanimEditorTheme } from './editorStyle';
 import { getEditorThemeExtension } from './editorThemes';
 import { persistWanimCode } from './sourcePersistence';
-import type { WanimEditorTheme } from '../types';
+import type { WanimEditorFont, WanimEditorTheme } from '../types';
 import { saveBlockState } from './stateStore';
 import type { BlockState } from '../types';
 
@@ -78,7 +78,12 @@ export class WanimCodeEditorChild extends MarkdownRenderChild {
 			EditorView.lineWrapping,
 			EditorState.tabSize.of(4),
 			indentUnit.of('    '),
-			keymap.of([indentWithTab, ...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap]),
+			keymap.of([
+				indentWithTab,
+				...closeBracketsKeymap,
+				...defaultKeymap,
+				...historyKeymap,
+			]),
 			EditorView.updateListener.of((update) => {
 				if (update.docChanged) {
 					this.scheduleSave();
@@ -112,6 +117,7 @@ export class WanimCodeEditorChild extends MarkdownRenderChild {
 		// Apply initial font size from settings
 		this.editorFontSize = (this.plugin as any).settings.editorFontSize ?? 14;
 		this.setEditorFontSize(this.editorFontSize);
+		this.setEditorFontFamily((this.plugin as any).settings.editorFontFamily ?? 'JetBrains Mono');
 
 		this.editorView.scrollDOM.addEventListener('scroll', () => {
 			this.recordCurrentState();
@@ -142,31 +148,18 @@ export class WanimCodeEditorChild extends MarkdownRenderChild {
 			this.recordCurrentState();
 		});
 
-		// FIX: Ctrl+/ (Mod-/) commenting bug.
-		// Obsidian listens at the document/window level for Mod+/ and inserts its
-		// own %% comment syntax, which prevents CodeMirror from handling the event.
-		// Strategy: capture-phase listener on the editor host AND document runs before
-		// Obsidian's handler. We manually invoke CM's toggleComment command
-		// on the view, then preventDefault + stopPropagation to fully consume the event.
+		// Obsidian can install a higher-level Mod-/ handler. Keep a scoped capture
+		// fallback in addition to CM's keymap so the embedded editor always wins.
 		const handleCommentShortcut = (evt: KeyboardEvent) => {
 			const isMod = evt.ctrlKey || evt.metaKey;
-			if (!isMod || evt.key !== '/') return;
-			if (!this.editorView) return;
+			if (!isMod || (evt.key !== '/' && evt.code !== 'Slash')) return;
+			if (!this.editorView || !this.editorHostEl.contains(evt.target as Node)) return;
 			evt.preventDefault();
 			evt.stopPropagation();
-			// Dispatch the toggle-comment command directly on the editor view.
-			// toggleComment is part of defaultKeymap (Mod-/); calling it here ensures
-			// Python # line comments are used even when Obsidian intercepts first.
 			(toggleComment as any)(this.editorView);
 		};
 		this.editorHostEl.addEventListener('keydown', handleCommentShortcut, true);
-		// Document-level fallback: Obsidian may intercept Mod+/ at document level
-		// before the event reaches editorHostEl.
-		document.addEventListener('keydown', handleCommentShortcut, true);
-		this.register(() => {
-			this.editorHostEl.removeEventListener('keydown', handleCommentShortcut, true);
-			document.removeEventListener('keydown', handleCommentShortcut, true);
-		});
+		this.register(() => this.editorHostEl.removeEventListener('keydown', handleCommentShortcut, true));
 
 		(this.plugin as any).registerActiveEditor?.(this);
 	}
@@ -217,8 +210,13 @@ export class WanimCodeEditorChild extends MarkdownRenderChild {
 	}
 
 	setEditorFontSize(fontSize: number): void {
+		this.editorFontSize = fontSize;
+		// styles.css deliberately uses !important to match Obsidian's code-block
+		// typography.  Set the variable consumed by that rule as well as the CM6
+		// theme extension; otherwise a global stylesheet wins and this setting
+		// appears to do nothing.
+		this.editorHostEl.style.setProperty('--wanim-editor-font-size', `${fontSize}px`);
 		if (this.editorView) {
-			this.editorFontSize = fontSize;
 			this.editorView.dispatch({
 				effects: this.fontSizeCompartment.reconfigure(EditorView.theme({
 					'.cm-content': {
@@ -227,6 +225,13 @@ export class WanimCodeEditorChild extends MarkdownRenderChild {
 				})),
 			});
 		}
+	}
+
+	setEditorFontFamily(fontFamily: WanimEditorFont): void {
+		this.editorHostEl.style.setProperty(
+			'--wanim-editor-font-family',
+			`'${fontFamily}', var(--font-monospace)`,
+		);
 	}
 
 	getCode(): string {

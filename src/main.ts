@@ -2,7 +2,7 @@ import { Plugin } from 'obsidian';
 import { registerWanimCodeBlockProcessor } from './wanim/codeBlockProcessor';
 import { isVimEnabled } from './wanim/editorChild';
 import { DEFAULT_SETTINGS, WanimSettingTab } from './settings';
-import type { WanimEditorTheme, WanimPluginSettings, ThemeableEditor } from './types';
+import type { WanimEditorFont, WanimEditorTheme, WanimPluginSettings, ThemeableEditor } from './types';
 
 export default class WanimPlugin extends Plugin {
 	settings: WanimPluginSettings;
@@ -46,11 +46,25 @@ export default class WanimPlugin extends Plugin {
 		}
 	}
 
+	updateAllEditorFontFamilies(fontFamily: WanimEditorFont) {
+		for (const editor of this.activeEditors) {
+			try {
+				editor.setEditorFontFamily(fontFamily);
+			} catch (err) {
+				console.error('Failed to update editor font family', err);
+			}
+		}
+	}
+
 	async onload() {
+		// Register the tab before doing any asynchronous plugin setup.  This keeps
+		// Obsidian's Settings UI available even while a live scene is initializing.
+		this.settings = { ...DEFAULT_SETTINGS };
+		this.addSettingTab(new WanimSettingTab(this.app, this));
 		await this.loadSettings();
 
-		// Initialize the patched RapydScript compiler lazily on first render
-		// to avoid blocking plugin load or breaking Obsidian's settings UI
+		// The compiler itself is initialized lazily by the runtime, so settings
+		// never have to wait for a Wanim scene to load.
 		this.registerEvent(
 			(this.app.vault as any).on('config-changed', () => {
 				const isVim = isVimEnabled(this);

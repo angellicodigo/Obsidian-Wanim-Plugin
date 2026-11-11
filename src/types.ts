@@ -1,4 +1,5 @@
 export type WanimEditorTheme = 'obsidian' | 'github-light' | 'github-dark' | 'one-dark' | 'monokai';
+export type WanimEditorFont = 'JetBrains Mono' | 'Mononoki' | 'Monaspace Neon' | 'Source Code Pro' | 'Consolas';
 
 export interface WanimPluginSettings {
 	editorTheme: WanimEditorTheme;
@@ -7,6 +8,7 @@ export interface WanimPluginSettings {
 	renderQuality: string;
 	autoRunOnOpen: boolean;
 	editorFontSize: number;
+	editorFontFamily: WanimEditorFont;
 }
 
 export interface SceneStateChange {
@@ -33,6 +35,7 @@ export interface ThemeableEditor {
 	setEditorTheme(newTheme: WanimEditorTheme): void;
 	setVimEnabled?(enabled: boolean): void;
 	setEditorFontSize(fontSize: number): void;
+	setEditorFontFamily(fontFamily: WanimEditorFont): void;
 }
 
 export interface BlockState {

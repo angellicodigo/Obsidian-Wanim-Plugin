@@ -43,11 +43,16 @@
 	gap: 6px;
 }
 
-.manim-save-state {
+.manim-save-state,
+.manim-run-state {
 	order: 3;
 	font-size: 11px;
 	color: var(--text-muted);
 	padding: 0 4px;
+}
+
+.manim-save-state {
+	order: 4;
 }
 
 .manim-control-button {
@@ -139,11 +144,11 @@
 .manim-code-editor .cm-editor,
 .manim-code-editor .cm-content,
 .manim-code-editor .cm-line {
-	font-family: var(--manim-code-font-family, var(--font-monospace)) !important;
-	font-size: var(--manim-code-font-size, var(--code-size, 0.9em)) !important;
-	line-height: var(--manim-code-line-height, var(--line-height-normal, 1.5)) !important;
-	letter-spacing: var(--manim-code-letter-spacing, normal) !important;
-	font-weight: var(--manim-code-font-weight, 400) !important;
+	font-family: var(--wanim-editor-font-family, var(--wanim-code-font-family, var(--font-monospace))) !important;
+	font-size: var(--wanim-editor-font-size, var(--wanim-code-font-size, var(--code-size, 0.9em))) !important;
+	line-height: var(--wanim-code-line-height, var(--line-height-normal, 1.5)) !important;
+	letter-spacing: var(--wanim-code-letter-spacing, normal) !important;
+	font-weight: var(--wanim-code-font-weight, 400) !important;
 }
 
 .manim-code-editor .cm-line {

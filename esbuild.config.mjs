@@ -32,6 +32,48 @@ const rapydscriptAsTextPlugin = {
 	},
 };
 
+// Wanim 0.1.3 exposes `useWebGL` on its renderer but its bridge does not pass
+// that option through.  Preserve the option so 3D scenes can use the Canvas2D
+// fallback in Electron, where OffscreenCanvas WebGL compositing may be black.
+const wanimBridgeOptionsPlugin = {
+	name: "wanim-bridge-options",
+	setup(build) {
+		build.onLoad({ filter: /[/\\]bridge\.browser\.js$/ }, async (args) => {
+			const contents = await fs.promises.readFile(args.path, "utf8");
+			const patched = contents.replace(
+				"onLoop:e.onLoop,onSceneReady:e.onSceneReady",
+				"onLoop:e.onLoop,useWebGL:e.useWebGL,onSceneReady:e.onSceneReady",
+			);
+			if (patched === contents) {
+				throw new Error("Unable to add useWebGL forwarding to the bundled Wanim bridge.");
+			}
+			return { contents: patched, loader: "js" };
+		});
+	},
+};
+
+// Electron cannot reliably composite Wanim's OffscreenCanvas WebGL output.
+// Prefer a regular DOM canvas for the scratch renderer, and keep the Canvas2D
+// fallback safe when its 3D projection produces an infinite gradient endpoint.
+const wanimThreeDCompatibilityPlugin = {
+	name: "wanim-three-d-compatibility",
+	setup(build) {
+		build.onLoad({ filter: /[/\\]wanim\.browser\.js$/ }, async (args) => {
+			const contents = await fs.promises.readFile(args.path, "utf8");
+			const gradientNeedle = "if(p0[0]===p1[0]&&p0[1]===p1[1])return rgbaToCss(first);let gradient=ctx.createLinearGradient";
+			const gradientReplacement = "if(!Number.isFinite(p0[0])||!Number.isFinite(p0[1])||!Number.isFinite(p1[0])||!Number.isFinite(p1[1])||p0[0]===p1[0]&&p0[1]===p1[1])return rgbaToCss(first);let gradient=ctx.createLinearGradient";
+			const canvasNeedle = "typeof OffscreenCanvas<\"u\"?new OffscreenCanvas(1,1):typeof document<\"u\"?document.createElement(\"canvas\"):null";
+			const canvasReplacement = "typeof document<\"u\"?document.createElement(\"canvas\"):typeof OffscreenCanvas<\"u\"?new OffscreenCanvas(1,1):null";
+			const withFiniteGradient = contents.replace(gradientNeedle, gradientReplacement);
+			const patched = withFiniteGradient.replace(canvasNeedle, canvasReplacement);
+			if (patched === contents) {
+				throw new Error("Unable to add Wanim's 3D Electron compatibility fixes.");
+			}
+			return { contents: patched, loader: "js" };
+		});
+	},
+};
+
 const context = await esbuild.context({
 	banner: {
 		js: banner,
@@ -65,7 +107,7 @@ const context = await esbuild.context({
 	define: {
 		"import.meta.url": JSON.stringify("http://localhost/"),
 	},
-	plugins: [rapydscriptAsTextPlugin],
+	plugins: [rapydscriptAsTextPlugin, wanimBridgeOptionsPlugin, wanimThreeDCompatibilityPlugin],
 });
 
 if (prod) {
