@@ -1,360 +1,301 @@
-/* ==========================================================================
-   Obsidian Wanim Plugin Styles
-   All selectors are strictly scoped under .wanim- or codeblock embed classes
-   to guarantee zero style leakage.
-   ========================================================================== */
-
-/* Seamless integration with Obsidian Live Preview codeblock wrapper */
-.cm-embed-block:has(.wanim-block) {
-    padding: 0 !important;
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
+.manim-block {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 10px;
+	padding: 8px 5px 5px;
+	margin: 0px 0px;
+	background: var(--background-secondary);
 }
 
-.cm-embed-block:has(.wanim-block):hover {
-    border: none !important;
+.manim-block-header {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 8px;
+	min-height: 24px;
+	padding: 0px;
+	cursor: pointer;
+	user-select: none;
 }
 
-.block-language-manim {
-    padding: 0 !important;
-    margin: 0 !important;
+.manim-collapse-caret {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	margin-left: 1px;
+	border-radius: 4px;
+	color: var(--text-muted);
+	font-size: 24px;
+	line-height: 1;
 }
 
-/* Block Container */
-.wanim-block {
-    border: 1px solid var(--background-modifier-border);
-    border-radius: 10px;
-    padding: 8px 5px 5px;
-    margin: 0 !important;
-    background: var(--background-secondary);
-    position: relative;
-    overflow: hidden;
-    font-family: var(--font-interface);
+.manim-collapse-caret:hover,
+.manim-collapse-caret:focus-visible {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+	outline: none;
 }
 
-/* Header & Controls */
-.wanim-header,
-.wanim-block-header {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-    min-height: 24px;
-    padding: 2px 36px 2px 6px;
-    cursor: pointer;
-    user-select: none;
-    border-bottom: 1px solid transparent;
+.manim-block-controls {
+	display: flex;
+	align-items: center;
+	gap: 6px;
 }
 
-.wanim-collapse-caret {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    margin-left: 1px;
-    border-radius: 4px;
-    color: var(--text-muted);
-    font-size: 20px;
-    line-height: 1;
-    cursor: pointer;
+.manim-save-state {
+	order: 3;
+	font-size: 11px;
+	color: var(--text-muted);
+	padding: 0 4px;
 }
 
-.wanim-collapse-caret:hover,
-.wanim-collapse-caret:focus-visible {
-    background: var(--background-modifier-hover);
-    color: var(--text-normal);
-    outline: none;
+.manim-control-button {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	padding: 2px 12px;
+	background: var(--interactive-normal);
+	color: var(--text-normal);
+	cursor: pointer;
+	font-size: 12px;
+	line-height: 1.5;
 }
 
-.wanim-controls,
-.wanim-block-controls {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+.manim-control-button:hover:not(:disabled) {
+	background: var(--interactive-hover);
 }
 
-.wanim-save-state {
-    order: 3;
-    font-size: 11px;
-    color: var(--text-muted);
-    padding: 0 4px;
+.manim-control-button:disabled {
+	opacity: 0.7;
+	cursor: wait;
 }
 
-.wanim-control-button {
-    border: 1px solid var(--background-modifier-border);
-    border-radius: 6px;
-    padding: 2px 12px;
-    background: var(--interactive-normal);
-    color: var(--text-normal);
-    cursor: pointer;
-    font-size: 12px;
-    line-height: 1.5;
+.manim-run-button {
+	order: 1;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: var(--background-secondary-alt);
+	color: var(--text-normal);
+	font-weight: 600;
 }
 
-.wanim-control-button:hover:not(:disabled) {
-    background: var(--interactive-hover);
+.manim-run-button:hover:not(:disabled) {
+	background: var(--background-modifier-hover);
 }
 
-.wanim-control-button:disabled {
-    opacity: 0.7;
-    cursor: wait;
+.manim-run-button .svg-icon,
+.manim-button-icon .svg-icon {
+	width: 14px;
+	height: 14px;
 }
 
-.wanim-run-button {
-    order: 1;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--background-secondary-alt);
-    color: var(--text-normal);
-    font-weight: 600;
+.manim-button-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.wanim-run-button:hover:not(:disabled) {
-    background: var(--background-modifier-hover);
+.manim-run-label {
+	line-height: 1;
 }
 
-.wanim-run-button .svg-icon,
-.wanim-button-icon .svg-icon {
-    width: 14px;
-    height: 14px;
+.manim-restart-button {
+	order: 2;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px 7px;
+	background: var(--background-secondary-alt);
+	color: var(--text-normal);
 }
 
-.wanim-button-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.manim-restart-button:hover:not(:disabled) {
+	background: var(--background-modifier-hover);
 }
 
-.wanim-run-label {
-    line-height: 1;
+.manim-restart-button .svg-icon {
+	width: 14px;
+	height: 14px;
 }
 
-.wanim-restart-button {
-    order: 2;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2px 7px;
-    background: var(--background-secondary-alt);
-    color: var(--text-normal);
+.manim-code-editor {
+	margin: 8px 0;
+	background: var(--code-background, var(--background-primary)) !important;
+	background-color: var(--code-background, var(--background-primary)) !important;
+	background-image: none !important;
+	border-radius: var(--code-radius, 6px);
+	border: 1px solid var(--background-modifier-border-hover, var(--background-modifier-border));
+	overflow: hidden;
 }
 
-.wanim-restart-button:hover:not(:disabled) {
-    background: var(--background-modifier-hover);
+.manim-code-editor .cm-editor {
+	background: var(--code-background, var(--background-primary)) !important;
+	background-color: var(--code-background, var(--background-primary)) !important;
+	background-image: none !important;
+	color: var(--code-normal, var(--text-normal));
 }
 
-.wanim-restart-button .svg-icon {
-    width: 14px;
-    height: 14px;
+.manim-code-editor .cm-editor,
+.manim-code-editor .cm-content,
+.manim-code-editor .cm-line {
+	font-family: var(--manim-code-font-family, var(--font-monospace)) !important;
+	font-size: var(--manim-code-font-size, var(--code-size, 0.9em)) !important;
+	line-height: var(--manim-code-line-height, var(--line-height-normal, 1.5)) !important;
+	letter-spacing: var(--manim-code-letter-spacing, normal) !important;
+	font-weight: var(--manim-code-font-weight, 400) !important;
 }
 
-/* CodeMirror 6 Python Editor Container */
-.wanim-code-editor {
-    margin: 8px 0;
-    background: var(--code-background, var(--background-primary)) !important;
-    background-color: var(--code-background, var(--background-primary)) !important;
-    background-image: none !important;
-    border-radius: var(--code-radius, 6px);
-    border: 1px solid var(--background-modifier-border-hover, var(--background-modifier-border));
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-    --wanim-vim-cursor-color: #f10707;
+.manim-code-editor .cm-line {
+	padding: 0 2px 0 6px !important;
 }
 
-.wanim-code-editor .cm-editor {
-    background: var(--code-background, var(--background-primary)) !important;
-    background-color: var(--code-background, var(--background-primary)) !important;
-    background-image: none !important;
-    color: var(--code-normal, var(--text-normal));
+.manim-code-editor .cm-scroller {
+	position: relative !important;
+	min-height: 220px;
+	max-height: 320px;
+	overflow: auto;
+	background: var(--code-background, var(--background-primary)) !important;
+	background-color: var(--code-background, var(--background-primary)) !important;
+	background-image: none !important;
 }
 
-.wanim-code-editor .cm-editor,
-.wanim-code-editor .cm-content,
-.wanim-code-editor .cm-line {
-    font-family: var(--wanim-code-font-family, var(--font-monospace)) !important;
-    font-size: var(--wanim-code-font-size, var(--code-size, 0.9em)) !important;
-    line-height: var(--wanim-code-line-height, var(--line-height-normal, 1.5)) !important;
-    letter-spacing: var(--wanim-code-letter-spacing, normal) !important;
-    font-weight: var(--wanim-code-font-weight, 400) !important;
+.manim-code-editor .cm-content {
+	padding: var(--size-4-2, 8px) var(--size-4-4, 12px) !important;
+	tab-size: 4 !important;
+	caret-color: #ffffff !important;
 }
 
-.wanim-code-editor .cm-line {
-    padding: 0 2px 0 6px !important;
+.manim-code-editor .cm-focused {
+	outline: none;
 }
 
-.wanim-code-editor .cm-scroller {
-    position: relative !important;
-    min-height: 220px;
-    max-height: 320px;
-    overflow: auto;
-    background: var(--code-background, var(--background-primary)) !important;
-    background-color: var(--code-background, var(--background-primary)) !important;
-    background-image: none !important;
+.manim-code-editor {
+	--manim-vim-cursor-color: #f10707;
 }
 
-.wanim-code-editor .cm-content {
-    padding: var(--size-4-2, 8px) var(--size-4-4, 12px) !important;
-    tab-size: 4 !important;
-    caret-color: #ffffff !important;
+/* Ensure Vim cursor layer is positioned and visible */
+.manim-code-editor .cm-vimCursorLayer {
+	display: block !important;
+	visibility: visible !important;
+	position: absolute !important;
+	top: 0 !important;
+	left: 0 !important;
+	z-index: 100 !important;
+	pointer-events: none !important;
 }
 
-.wanim-code-editor .cm-focused {
-    outline: none;
+/* Bright red block cursor for Vim Normal Mode */
+.manim-code-editor .cm-fat-cursor,
+.manim-code-editor .cm-editor .cm-fat-cursor,
+.manim-code-editor .cm-editor:not(.cm-focused) .cm-fat-cursor,
+.manim-code-editor:not(.cm-focused) .cm-fat-cursor,
+.cm-fat-cursor {
+	display: inline-block !important;
+	visibility: visible !important;
+	position: absolute !important;
+	background: var(--manim-vim-cursor-color, #f10707) !important;
+	background-color: var(--manim-vim-cursor-color, #f10707) !important;
+	border: none !important;
+	border-left: none !important;
+	outline: none !important;
+	white-space: pre !important;
+	z-index: 100 !important;
+	color: #ffffff !important;
+	min-width: 0.65em !important;
+	line-height: 1.2 !important;
+	opacity: 0.75 !important;
+	pointer-events: none !important;
 }
 
-/* ==========================================================================
-   Vim Mode Integration & Cursors (R2)
-   Strictly scoped to .wanim-code-editor to eliminate global leak.
-   ========================================================================== */
-
-/* Vim Cursor Layer Positioning */
-.wanim-code-editor .cm-vimCursorLayer {
-    display: block !important;
-    visibility: visible !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    z-index: 100 !important;
-    pointer-events: none !important;
+/* Force standard cursorLayer to display in Insert Mode even if the outer note has .cm-vimMode */
+.manim-code-editor .cm-scroller:not(.cm-vimMode) .cm-cursorLayer,
+.manim-code-editor .cm-scroller:not(.cm-vimMode) .cm-cursorLayer:not(.cm-vimCursorLayer),
+.manim-code-editor .cm-scroller:not(.cm-vimMode) > .cm-cursorLayer {
+	display: block !important;
+	visibility: visible !important;
+	opacity: 1 !important;
 }
 
-/* Bright Red Block Cursor for Normal Mode (#f10707) */
-.wanim-code-editor .cm-fat-cursor,
-.wanim-code-editor .cm-editor .cm-fat-cursor,
-.wanim-code-editor .cm-editor:not(.cm-focused) .cm-fat-cursor,
-.wanim-code-editor:not(.cm-focused) .cm-fat-cursor,
-.wanim-code-editor .cm-vimCursorLayer .cm-fat-cursor {
-    display: inline-block !important;
-    visibility: visible !important;
-    position: absolute !important;
-    background: var(--wanim-vim-cursor-color, #f10707) !important;
-    background-color: var(--wanim-vim-cursor-color, #f10707) !important;
-    border: none !important;
-    border-left: none !important;
-    outline: none !important;
-    white-space: pre !important;
-    z-index: 100 !important;
-    color: #ffffff !important;
-    min-width: 0.65em !important;
-    line-height: 1.2 !important;
-    opacity: 0.75 !important;
-    pointer-events: none !important;
+/* Hide standard cursorLayer only when OUR inner editor is in Vim Normal Mode */
+.manim-code-editor .cm-scroller.cm-vimMode .cm-cursorLayer:not(.cm-vimCursorLayer) {
+	display: none !important;
 }
 
-/* Force Standard cursorLayer in Insert Mode (defeats outer Obsidian .cm-vimMode) */
-.wanim-code-editor .cm-scroller:not(.cm-vimMode) .cm-cursorLayer,
-.wanim-code-editor .cm-scroller:not(.cm-vimMode) .cm-cursorLayer:not(.cm-vimCursorLayer),
-.wanim-code-editor .cm-scroller:not(.cm-vimMode) > .cm-cursorLayer {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+/* White thin cursor line in Insert Mode */
+.manim-code-editor .cm-scroller:not(.cm-vimMode) .cm-cursor,
+.manim-code-editor .cm-cursor:not(.cm-fat-cursor),
+.manim-code-editor .cm-dropCursor {
+	display: block !important;
+	visibility: visible !important;
+	border-left: 2px solid #ffffff !important;
+	border-left-width: 2px !important;
+	border-left-color: #ffffff !important;
+	width: 0 !important;
+	background: transparent !important;
+	z-index: 100 !important;
+	opacity: 1 !important;
 }
 
-/* Suppress Standard cursorLayer only when inner editor is in Normal/Visual Mode */
-.wanim-code-editor .cm-scroller.cm-vimMode .cm-cursorLayer:not(.cm-vimCursorLayer) {
-    display: none !important;
+
+.manim-code-editor .cm-activeLine {
+	background-color: var(--cursor-line-background, rgba(255, 255, 255, 0.06)) !important;
 }
 
-/* Thin White Line Cursor in Insert Mode */
-.wanim-code-editor .cm-scroller:not(.cm-vimMode) .cm-cursor,
-.wanim-code-editor .cm-cursor:not(.cm-fat-cursor),
-.wanim-code-editor .cm-dropCursor {
-    display: block !important;
-    visibility: visible !important;
-    border-left: 2px solid #ffffff !important;
-    border-left-width: 2px !important;
-    border-left-color: #ffffff !important;
-    width: 0 !important;
-    background: transparent !important;
-    z-index: 100 !important;
-    opacity: 1 !important;
+.manim-code-editor .cm-activeLineGutter {
+	background-color: var(--cursor-line-background, rgba(255, 255, 255, 0.06)) !important;
 }
 
-/* Active Line & Selection */
-.wanim-code-editor .cm-activeLine,
-.wanim-code-editor .cm-activeLineGutter {
-    background-color: var(--cursor-line-background, rgba(255, 255, 255, 0.06)) !important;
+.manim-code-editor .cm-selectionBackground,
+.manim-code-editor .cm-content ::selection {
+	background: var(--manim-selection-color, var(--text-selection)) !important;
 }
 
-.wanim-code-editor .cm-selectionBackground,
-.wanim-code-editor .cm-content ::selection {
-    background: var(--wanim-selection-color, var(--text-selection)) !important;
+.manim-canvas {
+	aspect-ratio: 16 / 9;
+	margin-top: 8px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+	padding: 0;
+	overflow: hidden;
+	background: var(--background-primary);
 }
 
-/* ==========================================================================
-   16:9 Responsive Canvas Layout
-   ========================================================================== */
-.wanim-canvas,
-.wanim-canvas-container {
-    aspect-ratio: 16 / 9;
-    margin-top: 8px;
-    border: 1px solid var(--background-modifier-border);
-    border-radius: 8px;
-    padding: 0;
-    overflow: hidden;
-    background: #000000;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.manim-canvas-viewport {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
-.wanim-canvas-viewport {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.manim-canvas-mount {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	max-width: 800px;
+	aspect-ratio: 16 / 9;
 }
 
-.wanim-canvas-mount {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    max-width: 800px;
-    aspect-ratio: 16 / 9;
+.manim-canvas-mount canvas,
+.manim-canvas-mount svg {
+	display: block;
+	max-width: 100%;
+	max-height: 100%;
+	margin: 0 auto;
 }
 
-.wanim-canvas-mount canvas,
-.wanim-canvas canvas,
-.wanim-canvas-container canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%;
-    margin: 0 auto;
-    object-fit: contain;
-}
-
-.wanim-canvas-container canvas,
-.wanim-canvas-container .wanim-canvas {
-    border: none !important;
-    border-radius: 0 !important;
-}
-
-/* ==========================================================================
-   Red Error Panel
-   ========================================================================== */
-.wanim-error-panel {
-    box-sizing: border-box;
-    width: 100%;
-    margin: 8px 0 0 0;
-    padding: 10px;
-    border: 1px solid color-mix(in srgb, var(--color-red) 60%, transparent);
-    border-radius: 8px;
-    background: color-mix(in srgb, var(--color-red) 8%, var(--background-primary));
-    color: var(--text-error, var(--color-red));
-    font-family: var(--font-monospace);
-    font-size: var(--code-size, 0.9em);
-    line-height: 1.45;
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow: auto;
-    max-height: 220px;
-    display: none;
+.manim-error-panel {
+	margin-top: 8px;
+	padding: 10px;
+	border: 1px solid color-mix(in srgb, var(--color-red), transparent 60%);
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--color-red), transparent 92%);
+	color: var(--text-error, var(--color-red));
+	font-family: var(--font-monospace);
+	font-size: var(--code-size, 0.9em);
+	line-height: 1.45;
+	white-space: pre-wrap;
+	overflow: auto;
+	max-height: 220px;
 }

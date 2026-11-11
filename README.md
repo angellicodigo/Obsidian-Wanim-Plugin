@@ -1,2 +1,0 @@
-# Obsidian-Wanim-Plugin
-
